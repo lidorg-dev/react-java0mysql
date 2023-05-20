@@ -41,4 +41,4 @@ secrets:
     file: db/password.txt
 networks:
   react-spring: {}
-  spring-mysql: {}
+  spring-mysql: {}  
