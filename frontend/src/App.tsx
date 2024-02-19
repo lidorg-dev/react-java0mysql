@@ -22,10 +22,10 @@ function App() {
         {greeting ? (
           <p>Hello from {greeting.name}</p>
         ) : (
-          <p>Loading...</p>
+          <p>Loading...loading/p>
         )}
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+          Edit <code>src/App.tsx</code> and save to reload. 
         </p>
         <a
           className="App-link"
