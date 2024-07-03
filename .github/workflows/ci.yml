@@ -22,7 +22,7 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     - name: Log in to JFrog Artifactory
-      run: docker login -u ${{ secrets.ARTIFACTORY_USERNAME }} nx1x.jfrog.io -p ${{ secrets.ARTIFACTORY_PASSWORD }}
+      run: echo ${{ secrets.ARTIFACTORY_PASSWORD }} | docker login -u ${{ secrets.ARTIFACTORY_USERNAME }} --password-stdin nx1x.jfrog.io
 
     - name: Build and push
       run: |
