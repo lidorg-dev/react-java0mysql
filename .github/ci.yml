@@ -1,0 +1,40 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to JFrog Artifactory
+      run: echo ${{ secrets.ARTIFACTORY_PASSWORD }} | docker login -u ${{ secrets.ARTIFACTORY_USERNAME }} --password-stdin nx1x.jfrog.io
+
+    - name: Build and push
+      run: |
+        docker-compose -f ./docker-compose.yml build
+        docker tag e9027fe4d91c nx1x.jfrog.io/nx1x-docker/mysql:github-actions-8.0.27
+        docker push nx1x.jfrog.io/nx1x-docker/mysql:github-actions-8.0.27
+        docker tag 1fd100113509 nx1x.jfrog.io/nx1x-docker/react-java0mysql-backend:github-actions-1
+        docker push nx1x.jfrog.io/nx1x-docker/react-java0mysql-backend:github-actions-1
+        docker tag bf24eb6ccc0c nx1x.jfrog.io/nx1x-docker/react-java0mysql-frontend:github-actions-1
+        docker push nx1x.jfrog.io/nx1x-docker/react-java0mysql-frontend:github-actions-1
+
+    - name: Test containers
+      run: |
+        docker-compose up -d
+        # Add your test commands here
