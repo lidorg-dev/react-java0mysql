@@ -36,16 +36,12 @@ jobs:
           # Get ECR repository URI
           REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
 
-          # Tag the images with the ECR repository URI
-          services=$(docker-compose -f ./docker-compose.yml config --services)
-          for service in $services; do
-            docker tag ${service}:$IMAGE_TAG $REPOSITORY_URI/$service:$IMAGE_TAG
-          done
+          # Tag and push only the built images (backend and frontend)
+          docker tag backend:latest $REPOSITORY_URI/backend:latest
+          docker tag frontend:latest $REPOSITORY_URI/frontend:latest
 
-          # Push the images to ECR
-          for service in $services; do
-            docker push $REPOSITORY_URI/$service:$IMAGE_TAG
-          done
+          docker push $REPOSITORY_URI/backend:latest
+          docker push $REPOSITORY_URI/frontend:latest
 
       - name: Logout from Amazon ECR
         run: |
