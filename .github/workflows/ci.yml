@@ -38,6 +38,3 @@ jobs:
 
       - name: Logout from Amazon ECR
         run: docker logout https://$REPOSITORY_URI
-
-
-        test
