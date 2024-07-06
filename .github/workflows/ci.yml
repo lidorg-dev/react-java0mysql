@@ -22,23 +22,21 @@ jobs:
 
       - name: Log in to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build and push images using Docker Compose
         env:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: latest
         run: |
-          # Log in to ECR
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-
-          # Build and tag the images using Docker Compose
+          # Build the Docker images using Docker Compose
           docker-compose -f ./docker-compose.yml build
-          
+
           # Get ECR repository URI
-          REPOSITORY_URI=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region ${{ secrets.AWS_REGION }} --query "repositories[0].repositoryUri" --output text)
-          
-          # Tag the images with ECR repository URI
+          REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
+
+          # Tag the images with the ECR repository URI
           services=$(docker-compose -f ./docker-compose.yml config --services)
           for service in $services; do
             docker tag ${service}:$IMAGE_TAG $REPOSITORY_URI/$service:$IMAGE_TAG
@@ -49,6 +47,6 @@ jobs:
             docker push $REPOSITORY_URI/$service:$IMAGE_TAG
           done
 
-
       - name: Logout from Amazon ECR
-        run: docker logout https://$REPOSITORY_URI
+        run: |
+          docker logout ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
