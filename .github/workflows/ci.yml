@@ -25,24 +25,20 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-      - name: Build and push images using Docker Compose
-        env:
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: latest
+      - name: Build and tag backend image
         run: |
-          # Build the Docker images using Docker Compose
-          docker-compose -f ./docker-compose.yml build
-
-          # Get ECR repository URI
-          REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
-
-          # Tag and push only the built images (backend and frontend)
-          docker tag backend:latest $REPOSITORY_URI/backend:latest
-          docker tag frontend:latest $REPOSITORY_URI/frontend:latest
-
-          docker push $REPOSITORY_URI/backend:latest
-          docker push $REPOSITORY_URI/frontend:latest
-
+            docker-compose -f ./docker-compose.yml build backend
+            REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
+            docker tag backend:latest $REPOSITORY_URI/backend:latest
+            docker push $REPOSITORY_URI/backend:latest
+  
+      - name: Build and tag frontend image
+        run: |
+            docker-compose -f ./docker-compose.yml build frontend
+            REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
+            docker tag frontend:latest $REPOSITORY_URI/frontend:latest
+            docker push $REPOSITORY_URI/frontend:latest
+  
       - name: Logout from Amazon ECR
         run: |
           docker logout ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
