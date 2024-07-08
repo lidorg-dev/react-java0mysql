@@ -25,30 +25,46 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-      - name: Build and tag backend image
+      - name: Build backend image
         run: |
             docker-compose -f ./docker-compose.yml build backend
-            IMAGE_ID=$(docker images -q nx1x-backend:latest)
+
+      - name: Debug backend image build
+        run: |
+            docker images
+
+      - name: Tag and push backend image
+        run: |
+            IMAGE_ID=$(docker images -q react-java0mysql_backend:latest)
             if [ -z "$IMAGE_ID" ]; then
               echo "Backend image not found!"
               exit 1
             fi
+            echo "Backend image ID: $IMAGE_ID"
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
             docker tag $IMAGE_ID $REPOSITORY_URI/backend:latest
             docker push $REPOSITORY_URI/backend:latest
-  
-      - name: Build and tag frontend image
+
+      - name: Build frontend image
         run: |
             docker-compose -f ./docker-compose.yml build frontend
-            IMAGE_ID=$(docker images -q nx1x-frontend:latest)
+
+      - name: Debug frontend image build
+        run: |
+            docker images
+
+      - name: Tag and push frontend image
+        run: |
+            IMAGE_ID=$(docker images -q react-java0mysql_frontend:latest)
             if [ -z "$IMAGE_ID" ]; then
               echo "Frontend image not found!"
               exit 1
             fi
+            echo "Frontend image ID: $IMAGE_ID"
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
             docker tag $IMAGE_ID $REPOSITORY_URI/frontend:latest
             docker push $REPOSITORY_URI/frontend:latest
-  
+
       - name: Logout from Amazon ECR
         run: |
           docker logout ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
