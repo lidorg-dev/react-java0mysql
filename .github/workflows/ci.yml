@@ -28,15 +28,17 @@ jobs:
       - name: Build and tag backend image
         run: |
             docker-compose -f ./docker-compose.yml build backend
+            IMAGE_ID=$(docker images -q nx1x-backend:latest)
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
-            docker tag backend:latest $REPOSITORY_URI/backend:latest
+            docker tag $IMAGE_ID $REPOSITORY_URI/backend:latest
             docker push $REPOSITORY_URI/backend:latest
   
       - name: Build and tag frontend image
         run: |
             docker-compose -f ./docker-compose.yml build frontend
+            IMAGE_ID=$(docker images -q nx1x-frontend:latest)
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
-            docker tag frontend:latest $REPOSITORY_URI/frontend:latest
+            docker tag $IMAGE_ID $REPOSITORY_URI/frontend:latest
             docker push $REPOSITORY_URI/frontend:latest
   
       - name: Logout from Amazon ECR
