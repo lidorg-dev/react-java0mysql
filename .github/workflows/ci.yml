@@ -33,6 +33,10 @@ jobs:
         run: |
             docker images
 
+      - name: Create ECR repository for backend if it doesn't exist
+        run: |
+            aws ecr describe-repositories --repository-names "${{ secrets.ECR_BACKEND_REPOSITORY }}" || aws ecr create-repository --repository-name "${{ secrets.ECR_BACKEND_REPOSITORY }}"
+
       - name: Tag and push backend image
         run: |
             IMAGE_ID=$(docker images -q react-java0mysql_backend:latest)
@@ -41,9 +45,9 @@ jobs:
               exit 1
             fi
             echo "Backend image ID: $IMAGE_ID"
-            REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
-            docker tag $IMAGE_ID $REPOSITORY_URI/backend:latest
-            docker push $REPOSITORY_URI/backend:latest
+            REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_BACKEND_REPOSITORY }}
+            docker tag $IMAGE_ID $REPOSITORY_URI:latest
+            docker push $REPOSITORY_URI:latest
 
       - name: Build frontend image
         run: |
@@ -53,6 +57,10 @@ jobs:
         run: |
             docker images
 
+      - name: Create ECR repository for frontend if it doesn't exist
+        run: |
+            aws ecr describe-repositories --repository-names "${{ secrets.ECR_FRONTEND_REPOSITORY }}" || aws ecr create-repository --repository-name "${{ secrets.ECR_FRONTEND_REPOSITORY }}"
+
       - name: Tag and push frontend image
         run: |
             IMAGE_ID=$(docker images -q react-java0mysql_frontend:latest)
@@ -61,9 +69,9 @@ jobs:
               exit 1
             fi
             echo "Frontend image ID: $IMAGE_ID"
-            REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
-            docker tag $IMAGE_ID $REPOSITORY_URI/frontend:latest
-            docker push $REPOSITORY_URI/frontend:latest
+            REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_FRONTEND_REPOSITORY }}
+            docker tag $IMAGE_ID $REPOSITORY_URI:latest
+            docker push $REPOSITORY_URI:latest
 
       - name: Logout from Amazon ECR
         run: |
