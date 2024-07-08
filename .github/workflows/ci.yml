@@ -27,17 +27,17 @@ jobs:
 
       - name: Build and tag backend image
         run: |
-            docker-compose -f ./docker-compose.yml build backend
+            docker-compose -f ./docker-compose.yml build react-java0mysql-backend
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
-            docker tag backend:latest $REPOSITORY_URI/backend:latest
-            docker push $REPOSITORY_URI/backend:latest
+            docker tag react-java0mysql-backend:latest $REPOSITORY_URI/react-java0mysql-backend:latest
+            docker push $REPOSITORY_URI/react-java0mysql-backend:latest
   
       - name: Build and tag frontend image
         run: |
-            docker-compose -f ./docker-compose.yml build frontend
+            docker-compose -f ./docker-compose.yml build react-java0mysql-frontend
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
-            docker tag frontend:latest $REPOSITORY_URI/frontend:latest
-            docker push $REPOSITORY_URI/frontend:latest
+            docker tag react-java0mysql-frontend:latest $REPOSITORY_URI/react-java0mysql-frontend:latest
+            docker push $REPOSITORY_URI/react-java0mysql-frontend:latest
   
       - name: Logout from Amazon ECR
         run: |
