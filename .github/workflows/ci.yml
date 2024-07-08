@@ -29,6 +29,10 @@ jobs:
         run: |
             docker-compose -f ./docker-compose.yml build backend
             IMAGE_ID=$(docker images -q nx1x-backend:latest)
+            if [ -z "$IMAGE_ID" ]; then
+              echo "Backend image not found!"
+              exit 1
+            fi
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
             docker tag $IMAGE_ID $REPOSITORY_URI/backend:latest
             docker push $REPOSITORY_URI/backend:latest
@@ -37,6 +41,10 @@ jobs:
         run: |
             docker-compose -f ./docker-compose.yml build frontend
             IMAGE_ID=$(docker images -q nx1x-frontend:latest)
+            if [ -z "$IMAGE_ID" ]; then
+              echo "Frontend image not found!"
+              exit 1
+            fi
             REPOSITORY_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
             docker tag $IMAGE_ID $REPOSITORY_URI/frontend:latest
             docker push $REPOSITORY_URI/frontend:latest
