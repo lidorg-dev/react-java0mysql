@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: 199051453468.dkr.ecr.eu-central-1.amazonaws.com/backend-eden:latest
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: ecr-secret
