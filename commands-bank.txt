@@ -1,0 +1,13 @@
+backend:
+
+kubectl create secret docker-registry ecr-secret \
+  --docker-server=199051453468.dkr.ecr.eu-central-1.amazonaws.com \
+  --docker-username=AWS \
+  --docker-password=$(aws ecr get-login-password --region eu-central-1)
+
+frontend:
+
+kubectl create secret docker-registry ecr-secret \
+  --docker-server=199051453468.dkr.ecr.eu-central-1.amazonaws.com/frontend-eden \
+  --docker-username=AWS \
+  --docker-password=$(aws ecr get-login-password --region eu-central-1)
