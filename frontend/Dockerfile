@@ -1,4 +1,4 @@
-FROM node:lts AS development
+FROM node:24.13.0-bookworm AS development
 
 WORKDIR /code
 COPY package.json /code/package.json
